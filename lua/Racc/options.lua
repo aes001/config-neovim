@@ -10,7 +10,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 })
 vim.opt.list = true
 vim.opt.listchars = {
-	tab = '🠺 ',
+	tab = '→ ',
 	trail = '·',       -- Trailing spaces show as ·
 	extends = '>',     -- when line extends beyond window
 	precedes = '<',    -- when line precedes window start
