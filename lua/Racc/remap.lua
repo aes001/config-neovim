@@ -2,6 +2,36 @@ vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
 vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol' })
 
+
+-- Switch to normal mode if we are in a terminal buffer
+vim.keymap.set('t', '<C-space>', [[<C-\><C-n>]], { noremap = true })
+
+-- Toggle between terminal buffer and previous buffer if we are in normal mode
+vim.keymap.set('n', '<C-Space>', function()
+
+	if vim.bo.buftype == "terminal" then
+		vim.cmd("b#")
+		return
+	end
+
+	local term_bufnr = nil
+	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+		if vim.bo[bufnr].buftype == "terminal" then
+			term_bufnr = bufnr
+			break
+		end
+	end
+
+	if term_bufnr then
+		vim.api.nvim_set_current_buf(term_bufnr)
+	else
+		vim.cmd("terminal")
+	end
+
+	vim.cmd("startinsert")
+end, { noremap = true, silent = true })
+
+
 -- Switch between C++ source and header
 vim.keymap.set("n", "<leader>o", function()
 	local filetype = vim.bo.filetype
