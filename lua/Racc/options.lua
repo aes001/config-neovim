@@ -30,3 +30,14 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	severity_sort = true,
 })
+
+-- Shortcuts for going to definition. Should probably go into remap but idfk
+-- ok this has been stupidly annoying to get working
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(ev)
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition,  { buffer = ev.buf, silent = true, noremap = true, desc = "Go to definition" })
+		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = ev.buf, silent = true, noremap = true, desc = "Go to declaration" })
+		vim.keymap.set("n", "K",  vim.lsp.buf.hover,       { buffer = ev.buf, silent = true, noremap = true, desc = "Hover docs" })
+		vim.keymap.set("n", "gr", vim.lsp.buf.references,  { buffer = ev.buf, silent = true, noremap = true, desc = "References" })
+	end
+})

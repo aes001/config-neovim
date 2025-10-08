@@ -1,6 +1,11 @@
 vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
 vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol' })
+vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = 'View diagnostic message' })
+vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { desc = 'Apply suggested fix' })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Diagnostics: Go to next' })
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Diagnostics: Go to previous' })
+
 
 
 -- Switch to normal mode if we are in a terminal buffer
@@ -35,7 +40,7 @@ end, { noremap = true, silent = true })
 -- Switch between C++ source and header
 vim.keymap.set("n", "<leader>o", function()
 	local filetype = vim.bo.filetype
-	local isCppFile = filetype == "cpp" or filetype == "h"
+	local isCppFile = filetype == "cpp" or filetype == "h" or filetype == "hpp" or filetype == "c"
 
 	if not isCppFile then
 		vim.notify("Not a C++ file. Can't switch between source and header", vim.log.levels.WARN)
@@ -43,17 +48,23 @@ vim.keymap.set("n", "<leader>o", function()
 	end
 
 
-	local clients = vim.lsp.get_clients({ bufnr = 0 })
-	local isClangdAttached = #clients > 0
+	-- Get a clangd client
+	local clangd = nil
+	for _, client in pairs(vim.lsp.get_clients({ bufnr = 0})) do
+		if client.name == "clangd" then
+			clangd = client
+			break
+		end
+	end
 
-	if not isClangdAttached then
+	if not clangd then
 		vim.notify("No LSP client attached", vim.log.levels.WARN)
 		return
 	end
 
 
 	local params = { uri = vim.uri_from_bufnr(0) }
-	vim.lsp.buf_request(0, "textDocument/switchSourceHeader", params, function(err, result)
+	clangd.request("textDocument/switchSourceHeader", params, function(err, result)
 		if err then
 			vim.notify("Switch failed: " .. err.message, vim.log.levels.ERROR)
 		elseif not result then
@@ -61,6 +72,6 @@ vim.keymap.set("n", "<leader>o", function()
 		else
 			vim.cmd("edit " .. vim.uri_to_fname(result))
 		end
-	end)
+	end, 0)
 end, { desc = "Switch between header/source" })
 
