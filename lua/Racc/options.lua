@@ -12,6 +12,7 @@ vim.opt.list = true
 vim.opt.listchars = {
 	tab = '→ ',
 	trail = '·',       -- Trailing spaces show as ·
+	space = '·',
 	extends = '>',     -- when line extends beyond window
 	precedes = '<',    -- when line precedes window start
 	nbsp = '+'         -- non-breaking space
